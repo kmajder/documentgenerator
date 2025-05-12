@@ -30,4 +30,4 @@ This is a FastAPI-based backend for generating Word documents from a data file (
 ### Steps
 1. `docker build -t documentgenerator-backend .`
 2. `docker run -p 8000:8000 documentgenerator-backend`
-3. `Visit localhost:8000/docs` to conveniently test the API
+3. Visit `localhost:8000/docs` to conveniently test the API
