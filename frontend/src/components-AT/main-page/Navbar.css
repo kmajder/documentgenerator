@@ -1,0 +1,186 @@
+.mainHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 50px;
+  width: 100%;
+  background: #000000;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  z-index: 1000;
+}
+
+.caseXpertLogo {
+  height: 100%; /* Logo zajmuje całą wysokość nagłówka */
+  display: flex;
+  align-items: center;
+}
+
+.caseXpertLogoImage {
+  height: 100%; /* Logo będzie miało pełną wysokość headera */
+  width: auto; /* Dynamicznie dopasowuje szerokość, aby zachować proporcje */
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-grow: 1;
+}
+
+.navbar a {
+  font-size: 18px;
+  color: #000000;
+  margin-left: 10px;
+  text-decoration: none;
+}
+
+.about {
+  position: absolute;
+  right: 25px;
+  color: white !important;
+}
+
+.navbar .sellLink {
+  border: 1px solid;
+  font-size: 18px;
+  border-radius: 12px;
+  padding: 5px;
+  background-color: rgb(251, 122, 255);
+  color: black;
+}
+.menu-toggle {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333333;
+  margin-left: auto;
+}
+
+.socialMedia {
+  position: absolute;
+  right: 100px;
+  color: white;
+}
+
+.socialOpen {
+  display: none;
+}
+.socialIcon {
+  position: relative;
+  top: 4px; /* Domyślna wartość top */
+  color: #ffffff;
+  font-size: 24px;
+  margin-left: 10px;
+  transition: color 0.3s ease;
+  justify-content: center;
+}
+
+.socialIcon:hover {
+  color: #ad32ff; /* Zmiana koloru na hover */
+}
+
+/* Dla mniejszych ekranów */
+@media (max-width: 768px) {
+  .mainHeader {
+    height: 8vh;
+  } 
+
+    
+  .navbar {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+    color: rgb(255, 255, 255);
+    font-size: 36px;
+    width: 15%;
+    margin-left: auto; /* Dodaj to, aby wyrównać do prawej */
+    text-align: right; /* Ustawienie tekstu (ikony hamburgera) do prawej */
+    padding-right: 10px; /* Opcjonalnie dodaj odstęp po prawej stronie */
+}
+
+
+  .navbar.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 8vh;
+    left: 0;
+    width: 100%;
+    background-color: hsl(282, 79%, 91%);
+    color: red;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
+  .socialOpen {
+    display: block;
+    color: black;
+  }
+  .socialMedia {
+    display: none;
+  }
+  .navbar a {
+    margin: 10px 0;
+  }
+
+
+  .caseXpertLogo {
+    height: 7vh; /* Logo na całą wysokość nawigacji */
+    justify-content: center; /* Wyśrodkowanie logo pionowo */
+  }
+
+  .caseXpertLogoImage {
+    height: 7vh; /* Logo nie zmienia wysokości */
+    width: 170px; /* Wypełnia całą szerokość, gdy ekran jest mały */
+    max-height: 8vh; /* Ograniczenie maksymalnej wysokości */
+  }
+  .about {
+    position: relative; /* Usuń pozycjonowanie absolutne dla wersji mobilnej */
+    right: 0px; /* Dostosuj margines, aby było estetyczne */
+    color: black !important;
+  }
+
+}
+
+/* Dropdown menu styles */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  flex-direction: column; /* Przesunięcie listy w dół */
+}
+
+
+.dropdown-content a {
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+/* Show dropdown when active */
+.dropdown-content.show {
+  display: block; /* Flex na mobilnych */
+}
