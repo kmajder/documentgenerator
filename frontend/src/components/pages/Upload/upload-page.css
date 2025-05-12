@@ -1,0 +1,115 @@
+/* upload-page.css */
+
+.upload-background {
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px);
+  z-index: -10;
+}
+
+.upload-container {
+  font-family: 'Poppins', sans-serif;
+  max-width: 100%;
+
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-header {
+  height: 6rem;
+  width: 100%;
+  color: white;
+  font-size: 1.5rem;
+  background: linear-gradient(to right, #ec4899, #8b5cf6);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background 1s;
+  text-align: center;
+  padding-top: 1rem;
+}
+
+.upload-header:hover {
+  background: linear-gradient(to left, #ec4899, #8b5cf6);
+}
+
+.upload-main {
+  margin-top: 1.25rem;
+  padding: 0;
+  border-radius: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 66%;
+}
+
+.upload-form {
+  background-color: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.upload-input-group {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.upload-input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.upload-input-group input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.upload-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #ec4899;
+  color: white;
+  border-radius: 0.5rem;
+  transition: background-color 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.upload-button:hover {
+  background-color: #db2777;
+}
+
+.excel-file-list,
+.word-file-list {
+  margin-top: 1rem;
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+
+.excel-file-item,
+.word-file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #f9fafb;
+  border-radius: 0.25rem;
+}
+
+.remove-excel-button,
+.remove-word-button {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #ef4444;
+}

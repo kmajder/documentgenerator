@@ -8,7 +8,9 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Layout from './components/Layout/Layout.js';
 import App from './App'; // <- Główna strona (Home)
 import AboutPage from './components/pages/About/About.jsx';
-
+import LoginPage from './components/pages/LoginPage/login-page.jsx';
+import RegisterPage from './components/pages/RegisterPage/register-page.jsx';
+import UploadPage from './components/pages/Upload/UploadPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -16,8 +18,10 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: '/', element: <App /> },
-      { path: '/about', element: <AboutPage /> },
-      { path: '/sprzedaj-iphone', element: <AboutPage /> },
+      { path: '/register', element: <RegisterPage/> },
+      { path: '/sprzedaj-iphone', element: <LoginPage/> },
+      { path: '/about', element: <AboutPage/> },
+      { path: '/upload', element: <UploadPage/> },
     ],
   },
 ]);
