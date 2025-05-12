@@ -11,7 +11,6 @@ const UploadPage = () => {
   const handleExcelUpload = (event) => {
     const files = Array.from(event.target.files);
     setExcelFiles((prev) => [...prev, ...files]);
-    
   };
 
   
@@ -34,31 +33,40 @@ const handleSubmit = async (event) => {
 
   // Dodaj pliki Excel
   for (const file of excelFiles) {
-    formData.append('excel_files', file);  // Klucz 'excel_files' w formularzu
+    formData.append('data_file', file);  // Klucz 'excel_files' w formularzu
   }
 
   // Dodaj pliki Word
   for (const file of wordFiles) {
-    formData.append('word_templates', file);  // Klucz 'word_templates' w formularzu
+    formData.append('template_file', file);  // Klucz 'word_templates' w formularzu
   }
 
   const endpoint = `http://localhost:8000/generate-docx`;
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch("http://localhost:8000/generate-docx/", {
       method: "POST",
-      body: formData,  // Wysyłanie FormData zawierającego pliki
+      body: formData,
     });
 
-    if (response.ok) {
-      console.log("OK");
-      window.alert('Wysłane!');
-    } else {
-      console.log("Not ok");
-      window.alert('Coś poszło nie tak');
+    if (!response.ok) {
+      throw new Error("Błąd podczas pobierania pliku");
     }
+
+    const blob = await response.blob(); // <- Pobieramy dane jako Blob (plik)
+    const url = window.URL.createObjectURL(blob); // <- Tworzymy URL do pobrania
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "wygenerowany-plik.zip"; // <- Nazwa zapisywanego pliku
+    a.click(); // <- Symulujemy kliknięcie, żeby rozpocząć pobieranie
+
+    window.URL.revokeObjectURL(url); // <- Sprzątamy po sobie
+
+    window.alert("Plik pobrany!");
   } catch (error) {
-    console.error(error);
+    console.error("Błąd:", error);
+    window.alert("Nie udało się pobrać pliku.");
   }
 };
 

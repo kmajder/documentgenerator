@@ -48,7 +48,7 @@ function Nav() {
       </div>
 
       <nav ref={menuRef} className={`navbar ${isMenuOpen ? 'open' : ''}`}>
-        <Link to="/sprzedaj-iphone" className="sellLink">Wygeneruj dokument!</Link>
+        <Link to="/upload" className="sellLink">Wygeneruj dokument!</Link>
         <Link to="/about" className="about">O nas</Link>
         <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="socialOpen">
           <FaInstagram className="socialIcon" />
