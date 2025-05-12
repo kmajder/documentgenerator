@@ -5,10 +5,17 @@ import pandas as pd
 from docxtpl import DocxTemplate
 from starlette.responses import FileResponse
 import zipfile
-
+from starlette.middleware.cors import CORSMiddleware 
 import tempfile
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Pozwól na żądania z tego źródła
+    allow_credentials=True,
+    allow_methods=["*"],  # Pozwól na wszystkie metody (GET, POST, PUT, DELETE, itd.)
+    allow_headers=["*"],  # Pozwól na wszystkie nagłówki
+)
 
 @app.post("/upload-data/")
 async def upload_data(file: UploadFile = File(...)):

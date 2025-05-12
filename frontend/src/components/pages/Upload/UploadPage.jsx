@@ -4,16 +4,6 @@ import ImageUploader from './image-uploader/image-uploader.js';
 import './upload-page.css';
 
 const UploadPage = () => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [price, setPrice] = useState('');
-  const [description, setDescription] = useState('');
-  const [technique, setTechnique] = useState('');
-  const [style, setStyle] = useState('');
-  const [width, setWidth] = useState('');
-  const [height, setHeight] = useState('');
-  const [year, setYear] = useState('');
-  const [images, setImages] = useState([]);
 
   const [excelFiles, setExcelFiles] = useState([]);
   const [wordFiles, setWordFiles] = useState([]);
@@ -21,8 +11,10 @@ const UploadPage = () => {
   const handleExcelUpload = (event) => {
     const files = Array.from(event.target.files);
     setExcelFiles((prev) => [...prev, ...files]);
+    
   };
 
+  
   const removeExcelFile = (index) => {
     setExcelFiles((prev) => prev.filter((_, i) => i !== index));
   };
@@ -36,41 +28,40 @@ const UploadPage = () => {
     setWordFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const formData = new FormData();
+const handleSubmit = async (event) => {
+  event.preventDefault();
+  const formData = new FormData();
 
-    for (const image of images) {
-      formData.append('files', image);
+  // Dodaj pliki Excel
+  for (const file of excelFiles) {
+    formData.append('excel_files', file);  // Klucz 'excel_files' w formularzu
+  }
+
+  // Dodaj pliki Word
+  for (const file of wordFiles) {
+    formData.append('word_templates', file);  // Klucz 'word_templates' w formularzu
+  }
+
+  const endpoint = `http://localhost:8000/generate-docx`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      body: formData,  // Wysyłanie FormData zawierającego pliki
+    });
+
+    if (response.ok) {
+      console.log("OK");
+      window.alert('Wysłane!');
+    } else {
+      console.log("Not ok");
+      window.alert('Coś poszło nie tak');
     }
+  } catch (error) {
+    console.error(error);
+  }
+};
 
-    for (const file of excelFiles) {
-      formData.append('excel_files', file);
-    }
-
-    for (const file of wordFiles) {
-      formData.append('word_templates', file);
-    }
-
-    const endpoint = `http://localhost:8000/offers/?title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}&price=${encodeURIComponent(price)}&description=${encodeURIComponent(description)}&technique=${encodeURIComponent(technique)}&style=${encodeURIComponent(style)}&width=${encodeURIComponent(width)}&height=${encodeURIComponent(height)}&year_created=${encodeURIComponent(year)}`;
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        console.log("OK");
-        window.alert('Wysłane!');
-      } else {
-        console.log("Not ok");
-        window.alert('Coś poszło nie tak');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   return (
     <>
