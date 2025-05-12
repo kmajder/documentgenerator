@@ -1,5 +1,5 @@
 📄 DocumentGenerator.pl
-DocumentGenerator.pl to platforma, która umożliwia szybkie generowanie dokumentów Word i PDF na podstawie danych z Excela oraz własnych szablonów. Użytkownicy mogą wgrać plik Excel, wybrać lub załadować własne szablony, a następnie wygenerować setki dokumentów z dynamicznymi danymi.
+to platforma, która umożliwia szybkie generowanie dokumentów Word i PDF na podstawie danych z Excela oraz własnych szablonów. Użytkownicy mogą wgrać plik Excel, wybrać lub załadować własne szablony, a następnie wygenerować setki dokumentów z dynamicznymi danymi.
 
 ✨ Funkcje:
 Generowanie dokumentów z danych w Excelu
