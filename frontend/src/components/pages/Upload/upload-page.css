@@ -13,7 +13,7 @@
 .upload-container {
   font-family: 'Poppins', sans-serif;
   max-width: 100%;
-
+  background-color: #F3F3E0;
   margin-left: auto;
   margin-right: auto;
   display: flex;
@@ -21,20 +21,21 @@
 }
 
 .upload-header {
-  height: 6rem;
+  height: auto;
   width: 100%;
   color: white;
   font-size: 1.5rem;
-  background: linear-gradient(to right, #ec4899, #8b5cf6);
+  background: linear-gradient(to right, #27548A, #2ab2fb);
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: background 1s;
   text-align: center;
-  padding-top: 1rem;
+  padding-top: 1.5rem;
+  box-sizing: border-box;
 }
 
 .upload-header:hover {
-  background: linear-gradient(to left, #ec4899, #8b5cf6);
+  background: linear-gradient(to left, #27548A, #2ab2fb);
 }
 
 .upload-main {
@@ -46,6 +47,44 @@
   width: 66%;
 }
 
+.tutorial-section {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.tutorial-steps {
+  display: flex;
+  justify-content: center;
+  gap: 40px; /* odstęp między krokami */
+  flex-wrap: wrap; /* aby na małych ekranach układało się pionowo */
+  margin-top: 30px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+}
+
+.step img {
+  width: 100%;
+  height: 25rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.step p {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+
+.tutorial-section h1 {
+  color: white;
+  text-align: center;
+}
 .upload-form {
   background-color: #f3f4f6;
   border-radius: 0.5rem;
@@ -56,6 +95,7 @@
 .upload-input-group {
   margin-bottom: 1rem;
   position: relative;
+  margin-top: 1rem;
 }
 
 .upload-input-group label {
@@ -73,25 +113,26 @@
 .upload-button {
   width: 100%;
   padding: 0.75rem;
-  background-color: #ec4899;
+  background-color: #183B4E;
   color: white;
   border-radius: 0.5rem;
   transition: background-color 0.3s;
   border: none;
   cursor: pointer;
+  margin-top: 1rem;
 }
 
 .upload-button:hover {
-  background-color: #db2777;
+  background-color: #27548A;
 }
 
 .excel-file-list,
 .word-file-list {
   margin-top: 1rem;
   background-color: #fff;
-  border: 1px solid #d1d5db;
+  border: 5px solid #d1d5db;
   border-radius: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.5rem;
 }
 
 .excel-file-item,
@@ -100,9 +141,11 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
   padding: 0.25rem 0.5rem;
   background-color: #f9fafb;
   border-radius: 0.25rem;
+  border: 3px solid #d1d5db;
 }
 
 .remove-excel-button,
@@ -111,5 +154,35 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #ef4444;
+  color: #adadad;
 }
+
+.remove-word-button:hover,
+.remove-excel-button:hover {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: rgb(255, 100, 100);;
+}
+
+.custom-file-upload {
+  width: 50px;
+  height: 50px;
+  font-size: 2rem;
+  color: #183B4E;
+  background-color: #e4e4e4;
+  border: 2px dashed #ccc;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.custom-file-upload:hover {
+  background-color: #d0d0d0;
+}
+

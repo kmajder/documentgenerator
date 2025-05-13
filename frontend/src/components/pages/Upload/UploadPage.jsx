@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { BiInfoCircle } from "react-icons/bi";
 import ImageUploader from './image-uploader/image-uploader.js';
 import './upload-page.css';
-
+import excelImage from './excelExample.png';
+import wordImage from './wordExample.png';
 const UploadPage = () => {
 
   const [excelFiles, setExcelFiles] = useState([]);
@@ -83,20 +84,42 @@ const handleSubmit = async (event) => {
           <h1>Wygeneruj dokumenty!</h1>
         </header>
 
+        <div className="tutorial-section">
+        <div className="tutorial-steps">
+          <div className="step">
+            <img src={excelImage} alt="Krok 1 - Excel" />
+            <p>1. Wgraj plik Excela z danymi</p>
+          </div>
+          <div className="step">
+            <img src={wordImage} alt="Krok 2 - Word" />
+            <p>2. Dodaj swój szablon Word/PDF - kolumny do podstawienia z Excela zamieść między klamrami: {"{{ }}"}</p>
+          </div>
+          <div className="step">
+            <img src={wordImage} alt="Krok 3 - Podsumowanie" />
+            <p>3. Sprawdź podsumowanie i wygeneruj dokumenty!</p>
+          </div>
+        </div>
+      </div>
+
         <main className="upload-main">
           <div>
             <form className="upload-form">
 
               <div className="upload-input-group">
-                <label htmlFor="excelUpload">Plik Excel (.xlsx / .xls)</label>
+                <label>Dodaj pliki Excel</label>
+                <div className="custom-file-upload" onClick={() => document.getElementById('excelUpload').click()}>
+                  ➕
+                </div>
                 <input
                   type="file"
                   id="excelUpload"
                   accept=".xlsx,.xls"
                   onChange={handleExcelUpload}
                   multiple
+                  style={{ display: 'none' }}
                 />
               </div>
+
 
               {excelFiles.length > 0 && (
                 <div className="excel-file-list">
@@ -116,13 +139,17 @@ const handleSubmit = async (event) => {
               )}
 
               <div className="upload-input-group">
-                <label htmlFor="wordUpload">Szablony Word (.docx / .doc)</label>
+                <label>Dodaj szablony Word</label>
+                <div className="custom-file-upload" onClick={() => document.getElementById('wordUpload').click()}>
+                  ➕
+                </div>
                 <input
                   type="file"
                   id="wordUpload"
                   accept=".docx,.doc"
                   onChange={handleWordUpload}
                   multiple
+                  style={{ display: 'none' }}
                 />
               </div>
 

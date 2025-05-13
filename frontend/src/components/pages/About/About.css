@@ -5,19 +5,22 @@
   margin: 0 auto;
   color: #333;
   line-height: 1.6;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  margin-top: 1rem;
 }
 
 header {
   text-align: center;
   margin-bottom: 2rem;
+  background-color: #27548A;
+  border-radius: 10px;
 }
 
 .abouth1 {
   font-size: 2.5rem;
-  color: #222;
+  color: white;
   margin-bottom: 0.5rem;
 }
 

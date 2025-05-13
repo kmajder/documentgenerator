@@ -2,31 +2,40 @@ import React, { useState, useEffect } from 'react';
 import './main-slider.css';
 import ip14pro from './slides/slide-images/ip14pro.png'
 import moneyImage from './slides/slide-images/moneyImage.png'
+import padlockImage from './slides/slide-images/padlock.png'
 import InPost from './slides/slide-images/inpost.png'
 const slides = [
+    {
+    content: 'Wbudowane hasłowanie plików',
+    image: padlockImage,
+    color: "#183B4E",
+    width: '10%',
+    marginLeft: '3rem',
+    imageVisible: true
+  },
   {
-    content: 'Jakaś bajera',
+    content: 'Zamień Excela na setki gotowych plików PDF/Word',
+    image: ip14pro,
+    color: "#183B4E",
+    width: '20%',
+    marginLeft: '10px',
+    imageVisible: false
+  },
+  {
+    content: 'Wygeneruj setki dokumentów w kilka sekund',
     image: moneyImage,
     width: '20%',
-    color: "black"
+    color: "#183B4E",
+    marginLeft: 'auto',
+    imageVisible: false
   },
   {
-    content: 'Jakaś bajera',
+    content: 'Dodaj własne szablony!',
     image: ip14pro,
-    color: "black",
+    color: "#183B4E",
     width: '20%',
-  },
-  {
-    content: 'Jakaś bajera',
-    image: InPost,
-    color: "black",
-    width: '20%',
-  },
-  {
-    content: 'Jakaś bajera',
-    image: ip14pro,
-    color: "black",
-    width: '20%',
+    marginLeft: 'auto',
+    imageVisible: false
   },
 ];
 
@@ -57,7 +66,7 @@ function Slider() {
         }}
       >
         <h1>{slides[currentSlideIndex].content}</h1>
-        <img style={{ width: slides[currentSlideIndex].width}} src={slides[currentSlideIndex].image} alt="Slider Image"/>
+        {slides[currentSlideIndex].imageVisible !== false && <img style={{ width: slides[currentSlideIndex].width, marginLeft: slides[currentSlideIndex].marginLeft}} src={slides[currentSlideIndex].image} alt="Slider Image"/>}
       </div>
     </div>
   );
