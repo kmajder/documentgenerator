@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 import AppleTrade from './image.png';
-import { FaFacebook, FaInstagram } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaUser } from 'react-icons/fa';
 
 function Nav() {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -49,8 +49,11 @@ function Nav() {
 
       <nav ref={menuRef} className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         <Link to="/upload" className="sellLink">Wygeneruj dokument!</Link>
-        <Link to="/upload-templates" className="sellLink">Moje szablony</Link>
+        <Link to="/my-templates" className="sellLink">Moje szablony</Link>
         <Link to="/about" className="about">O nas</Link>
+        <a href="/account" className="myAccount">
+          <FaUser className="socialIcon" />
+        </a>
         <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="socialOpen">
           <FaInstagram className="socialIcon" />
         </a>

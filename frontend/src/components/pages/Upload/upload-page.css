@@ -186,3 +186,18 @@
   background-color: #d0d0d0;
 }
 
+
+.excel-preview-box {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  font-family: monospace;
+}
+
+.document-preview {
+  margin-bottom: 1rem;
+}

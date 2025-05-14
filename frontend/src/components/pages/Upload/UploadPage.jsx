@@ -4,25 +4,53 @@ import ImageUploader from './image-uploader/image-uploader.js';
 import './upload-page.css';
 import excelImage from './excelExample.png';
 import wordImage from './wordExample.png';
+import preview from './preview.png';
 const UploadPage = () => {
 
   const [excelFiles, setExcelFiles] = useState([]);
   const [wordFiles, setWordFiles] = useState([]);
+  const [excelPreviewData, setExcelPreviewData] = useState([]);
+  
+  const handleExcelUpload = async (event) => {
+  const files = Array.from(event.target.files);
+  setExcelFiles((prev) => [...prev, ...files]);
+  event.target.value = '';
 
-  const handleExcelUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setExcelFiles((prev) => [...prev, ...files]);
-  };
+  if (files.length > 0) {
+    const formData = new FormData();
+    formData.append('file', files[0]); // tylko pierwszy plik do podglądu
+
+    try {
+      const response = await fetch('http://localhost:8000/upload-data/', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Błąd podczas pobierania podglądu");
+
+      const data = await response.json();
+      setExcelPreviewData(data);
+    } catch (error) {
+      console.error("Podgląd Excel - błąd:", error);
+      setExcelPreviewData([]);
+    }
+  }
+};
+
+
+const handleWordUpload = (event) => {
+  const files = Array.from(event.target.files);
+  setWordFiles((prev) => [...prev, ...files]);
+
+  // Zresetuj wartość inputa
+  event.target.value = '';
+};
 
   
   const removeExcelFile = (index) => {
     setExcelFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleWordUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setWordFiles((prev) => [...prev, ...files]);
-  };
 
   const removeWordFile = (index) => {
     setWordFiles((prev) => prev.filter((_, i) => i !== index));
@@ -169,7 +197,18 @@ const handleSubmit = async (event) => {
                   ))}
                 </div>
               )}
-
+                {excelPreviewData.length > 0 && (
+                  <div className="excel-preview-box">
+                    {excelPreviewData.map((item, index) => (
+                      <div key={index} className="document-preview">
+                        <strong>Dokument {index + 1}:</strong>
+                        <pre>
+                          {Object.entries(item).map(([key, value]) => `${key}: ${value}`).join('\n')}
+                        </pre>
+                      </div>
+                    ))}
+                  </div>
+                )}
               <button type="button" className="upload-button" onClick={handleSubmit}>
                 Wygeneruj!
               </button>

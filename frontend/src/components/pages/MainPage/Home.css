@@ -123,22 +123,20 @@ body {
   display: flex;
   flex-direction: column;
   color: white;
+  align-items: center;;
 }
 
 .aboutProcess h1 {
   margin-bottom: 10px;
-  text-align: center;
   font-size: 36px;
 }
 
 .aboutProcess ol {
-  text-align: center;
-  list-style-position: inside;
+  list-style-position: outside;
 }
 
 /* ========== SEKCJA: Dlaczego warto ========== */
 .askUs {
-  background-color: #F3F3E0;
   width: 100%;
   padding: 20px;
   border-radius: 8px;
@@ -146,17 +144,19 @@ body {
   display: flex;
   flex-direction: column;
   color: #183B4E;
+  align-items: center;;
 }
 
 .askUs h1 {
   margin-bottom: 10px;
-  text-align: center;
 }
 
+.askUs ol,
 .askUs ul {
-  text-align: center;
-  list-style-position: inside;
+  padding-left: 180px;
+  list-style-position: outside;
 }
+
 
 /* ========== RESPONSYWNOŚĆ: MOBILE (max-width: 768px) ========== */
 @media (max-width: 768px) {

@@ -11,7 +11,8 @@ import AboutPage from './components/pages/About/About.jsx';
 import LoginPage from './components/pages/LoginPage/login-page.jsx';
 import RegisterPage from './components/pages/RegisterPage/register-page.jsx';
 import UploadPage from './components/pages/Upload/UploadPage.jsx';
-
+import TemplatesPage  from './components/pages/manageTemplates/TemplatesPage.js'; // <- Strona zarządzania szablonami
+import AccountPage from './components/pages/AccountPage/AccountPage.jsx';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -22,6 +23,8 @@ const router = createBrowserRouter([
       { path: '/sprzedaj-iphone', element: <LoginPage/> },
       { path: '/about', element: <AboutPage/> },
       { path: '/upload', element: <UploadPage/> },
+      { path: '/my-templates', element: <TemplatesPage/> },
+      { path: '/account', element: <AccountPage/> },
     ],
   },
 ]);
