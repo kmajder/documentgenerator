@@ -40,7 +40,7 @@ const TemplatesPage = () => {
 
             {/* Podgląd pliku */}
             <iframe
-              src={`http://localhost:8000/templates/${template.id}/preview`} // <-- Tu Twoje źródło PDF/Word
+              src={`http://localhost:8000/templates/${template.id}/preview`} 
               title={`Podgląd ${template.name}`}
               className="template-preview"
             ></iframe>
@@ -52,7 +52,7 @@ const TemplatesPage = () => {
         <div>
           <h2 className="preview-header">Podgląd: {selectedTemplate.name}</h2>
           <iframe
-            src={`http://localhost:8000/templates/${selectedTemplate.id}/preview`} // <-- Tu Twój backend powinien zwracać plik PDF/Word
+            src={`http://localhost:8000/templates/${selectedTemplate.id}/preview`} 
             title="Podgląd szablonu"
             className="selected-template-preview"
           ></iframe>

@@ -1,20 +1,23 @@
-# Use the official Python image as the base image
-FROM python:3.10-slim
+# Dockerfile
+FROM python:3.11-slim
 
-# Set the working directory in the container
+# Ustaw zmienną środowiskową
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Tworzymy katalog roboczy
 WORKDIR /app
 
-# Copy the requirements file to the container
-COPY requirements.txt .
+# Kopiujemy pliki projektu
+COPY . /app
 
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Instalujemy zależności
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
 
-# Copy the application code to the container
-COPY . .
+# Otwieramy port
+EXPOSE 5000
 
-# Expose the port the app runs on
-EXPOSE 8000
+# Uruchamiamy aplikację
+CMD ["python", "app.py"]
 
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
