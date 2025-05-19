@@ -1,11 +1,17 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { BiInfoCircle } from "react-icons/bi";
 import ImageUploader from './image-uploader/image-uploader.js';
 import './upload-page.css';
 import excelImage from './excelExample.png';
 import wordImage from './wordExample.png';
 import preview from './preview.png';
+import { useAuth } from '../../../context/AuthContext.js';
+import { useNavigate } from 'react-router-dom';
+
 const UploadPage = () => {
+  const navigate = useNavigate();
+
+  const { user, logout } = useAuth();
 
   const [excelFiles, setExcelFiles] = useState([]);
   const [wordFiles, setWordFiles] = useState([]);
@@ -55,6 +61,8 @@ const handleWordUpload = (event) => {
   const removeWordFile = (index) => {
     setWordFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
+
 
 const handleSubmit = async (event) => {
   event.preventDefault();
@@ -209,9 +217,15 @@ const handleSubmit = async (event) => {
                     ))}
                   </div>
                 )}
+              {user ? (
               <button type="button" className="upload-button" onClick={handleSubmit}>
                 Wygeneruj!
               </button>
+              ) : (
+              <button type="button" className="upload-button" onClick={() => navigate('/login')}>
+                Zaloguj się żeby wygenerować!
+              </button>
+              )}
             </form>
           </div>
         </main>

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import './Navbar.css';
 import AppleTrade from './image.png';
 import { FaFacebook, FaInstagram, FaUser } from 'react-icons/fa';
-
+import { useAuth } from '../../context/AuthContext.js';
 function Nav() {
+  const { user, logout } = useAuth();
+
   const [isMenuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const burgerRef = useRef(null); // Referencja do hamburgera
@@ -49,11 +51,13 @@ function Nav() {
 
       <nav ref={menuRef} className={`navbar ${isMenuOpen ? 'open' : ''}`}>
         <Link to="/upload" className="sellLink">Wygeneruj dokument!</Link>
+        { user ? (
         <Link to="/my-templates" className="sellLink">Moje szablony</Link>
+        ) : null}
+        {user ? (
+        <button onClick={logout}></button>
+        ) : null}
         <Link to="/about" className="about">O nas</Link>
-        <a href="/account" className="myAccount">
-          <FaUser className="socialIcon" />
-        </a>
         <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="socialOpen">
           <FaInstagram className="socialIcon" />
         </a>
@@ -67,6 +71,11 @@ function Nav() {
           <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
             <FaFacebook className="socialIcon" />
           </a>
+          { user ? (
+          <a href="/account" className="myAccount">
+          <FaUser className="socialIcon" />
+          </a>
+          ) : null }
         </div>
       </nav>
     </header>

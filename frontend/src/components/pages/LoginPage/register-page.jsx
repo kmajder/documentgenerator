@@ -3,15 +3,14 @@ import axios from "axios";
 
 const RegisterPage = () => {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/auth/register", { username, email, password });
-      setMessage("Zarejestrowano pomyślnie! Możesz się teraz zalogować.");
+      const res = await axios.post("http://localhost:5000/auth/register", { email, username, password });
+      setMessage("Zarejestrowano pomyślnie! Potwierdź założenie konta w wiadomości e-mail.");
     } catch (err) {
       setMessage("Błąd rejestracji: " + err.response?.data?.message || err.message);
     }
@@ -41,7 +40,7 @@ const RegisterPage = () => {
           type="text"
           placeholder="Nazwa użytkownika"
           className="border p-2 rounded"
-          value={username}
+          value={password}
           onChange={(e) => setUsername(e.target.value)}
           required
         />

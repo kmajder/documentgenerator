@@ -1,101 +1,74 @@
-import React, { useState } from 'react';
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import axios from "axios";
+import { useAuth } from "../../../context/AuthContext.js";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
+  const { setUserWithoutMeEndpoint } = useAuth();
 
-
-  const checkForm = (formData) =>{
-
-    const { username, password } = formData;
-    
-    if (!username || !password) {
-      setError('Wypełnij oba pola.');
-      return false;
-    }
-
-    setError('');
-    return true
-  }
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-      
-    const formBody = new URLSearchParams({
-      grant_type: 'password', 
-      username: formData.username,
-      password: formData.password,
-    }).toString();
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/auth/login",
+        { email, password },
+        { withCredentials: true }
+      );
 
-    if (checkForm(formData)) {
+      const { user_id, username, email: userEmail, plan, exp } = res.data;
+      setUserWithoutMeEndpoint({ user_id, username, email: userEmail, plan, exp });
 
-      try {
-        const response = await fetch("http://localhost:8000/token", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: formBody,
-        });
-    
-        if (response.ok) {
-            console.log('User logged in successfully:', await response.json());
-        } else {
-            const errorData = await response.json();
-            setError(errorData.message || 'Logowanie nie powiodło się.');
-            console.error('Failed to login user:', errorData);
-        }
-      } catch (error) {
-          setError('Wystąpił błąd podczas logowania.');
-          console.error('Error during login:', error);
-      }
+      setMessage("Zalogowano pomyślnie!");
+    } catch (err) {
+      setMessage("Błąd logowania: " + (err.response?.data?.error || err.message));
     }
   };
+
   return (
-    <>
-      <div id='mainContainer' className="flex justify-center items-center w-full h-screen bg-cover bg-center" style={{ backgroundImage: 'url("../../Navbar/resources/painting-background-abstract.jpg")'}}>
-      <div id='loginForm' className="inline w-[500px] p-[30px] rounded-[15px] bg-[#F7B32B] shadow-[0_4px_15px_rgba(0,0,0,0.1)] font-poppins opacity-80 transition-transform transition-shadow duration-300 ease-in-out hover:shadow-[0_6px_20px_rgba(0,0,0,0.2)]">
-          <h2 className="text-[#020122] text-[26px] font-bold text-center mb-[20px]">Zaloguj się</h2>
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="mb-[20px]">
-              <label className="block mb-[8px] text-[#333] text-[14px]">Nazwa użytkownika:</label>
-              <input
-                type="username"
-                name="username"
-                value={formData.username}
-                onChange={handleInputChange}
-                className="w-full p-[12px] border border-[#cfd8dc] rounded-[8px] bg-[#FAFAFA] transition-all duration-300 focus:border-[#64b5f6] focus:shadow-[0_0_5px_rgba(100,181,246,0.5)] focus:outline-none text-[14px]"
-              />
-            </div>
-            <div className="mb-[20px]">
-              <label className="block mb-[8px] text-[#333] text-[14px]">Hasło:</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                className="w-full p-[12px] border border-[#cfd8dc] rounded-[8px] bg-[#FAFAFA] transition-all duration-300 focus:border-[#64b5f6] focus:shadow-[0_0_5px_rgba(100,181,246,0.5)] focus:outline-none text-[14px]"
-              />
-            </div>
-            {error && <p className="text-red-600 mb-[10px]">{error}</p>}
-            <p className="text-center">Nie masz konta? <Link to="/register" className="text-[#0D47A1] hover:text-[#1565C0]">Zarejestruj się!</Link></p>
-            <button type="submit" className="w-full p-[12px] bg-[#020122] text-white rounded-[8px] text-[16px] font-bold cursor-pointer transition-all duration-300 mt-[10px] hover:bg-[#84a2c5] active:bg-white">Login</button>
-          </form>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-300 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-3xl font-extrabold text-gray-800 text-center mb-6">Zaloguj się</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              placeholder="Twój email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Hasło</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="w-full px-4 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2.5 rounded-xl transition duration-200"
+          >
+            Zaloguj się
+          </button>
+        </form>
+
+        {message && (
+          <p className="mt-4 text-sm text-center text-red-600">{message}</p>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 
