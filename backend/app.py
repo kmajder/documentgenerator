@@ -2,6 +2,7 @@ from flask import Flask
 from extensions import mongo
 from routes.auth.auth import auth_bp
 from routes.templates.templates import templates_bp
+from routes.document_generator.document_generator import documents_bp
 #from routes.templates.templates import templates_bp
 from config import Config
 from flask_cors import CORS
@@ -17,6 +18,7 @@ def create_app():
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(templates_bp, url_prefix='/templates')
+    app.register_blueprint(documents_bp, url_prefix='/documents')
     #app.register_blueprint(templates_bp, url_prefix='/templates')
     # app.register_blueprint(templates_bp, url_prefix='/templates')
 
