@@ -1,7 +1,7 @@
 // AuthContext.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../components/Interceptor/api';
+import api from '../components/Interceptor/api-without-redirect';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {

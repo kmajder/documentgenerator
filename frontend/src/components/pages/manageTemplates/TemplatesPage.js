@@ -27,22 +27,30 @@ const TemplatesPage = () => {
   };
 
   const handleTemplateClick = async (key) => {
-    setError('')
-    setSelectedTemplate(key)
-    if (viewerDocument.current) viewerDocument.current.innerHTML = ''
+  setError('')
+  setSelectedTemplate(key)
+  if (viewerDocument.current) viewerDocument.current.innerHTML = ''
 
-    
   try {
     const response = await api.get(`/templates/get_template/${encodeURIComponent(key)}`, {
-      responseType: 'arraybuffer' // to ważne!
+      responseType: 'arraybuffer'
     });
 
     const arrayBuffer = response.data;
-    await renderAsync(arrayBuffer, viewerDocument.current);
+    const isPdf = key.toLowerCase().endsWith('.pdf');
+
+    if (isPdf) {
+      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(blob);
+      viewerDocument.current.innerHTML = `<iframe src="${pdfUrl}" width="100%" height="800px" style="border:none;"></iframe>`;
+    } else {
+      await renderAsync(arrayBuffer, viewerDocument.current);
+    }
   } catch (err) {
     setError('Błąd podczas ładowania dokumentu.');
   }
-  }
+}
+
 
   const handleUpload = async (e) => {
     e.preventDefault()

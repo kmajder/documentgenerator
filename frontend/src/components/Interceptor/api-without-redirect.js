@@ -44,8 +44,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         processQueue(err);
-        window.location.href = "/logout";
         return Promise.reject(err);
+        
       } finally {
         isRefreshing = false;
       }
