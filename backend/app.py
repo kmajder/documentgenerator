@@ -19,7 +19,7 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(templates_bp, url_prefix='/templates')
     app.register_blueprint(documents_bp, url_prefix='/documents')
-    #app.register_blueprint(templates_bp, url_prefix='/templates')
+    
     # app.register_blueprint(templates_bp, url_prefix='/templates')
 
     # ✅ Poprawna konfiguracja CORS

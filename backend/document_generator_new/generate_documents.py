@@ -55,3 +55,4 @@ def generate_documents():
 
     except Exception as e:
         return jsonify({"error": f"Błąd generowania dokumentów: {str(e)}"}), 500
+

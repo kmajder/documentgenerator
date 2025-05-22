@@ -4,6 +4,8 @@ werkzeug
 pyjwt
 flask-cors
 boto3
+wkhtmltopdf
+pdfkit
 annotated-types==0.7.0
 anyio==4.9.0
 babel==2.17.0

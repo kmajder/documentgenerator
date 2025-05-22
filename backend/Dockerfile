@@ -14,7 +14,7 @@ COPY . /app
 # Instalujemy zależności
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-
+RUN apt update && apt install wkhtmltopdf -y
 # Otwieramy port
 EXPOSE 5000
 

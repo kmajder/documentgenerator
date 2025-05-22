@@ -171,6 +171,7 @@
   width: 50px;
   height: 50px;
   font-size: 2rem;
+  margin-top: 1rem;
   color: #183B4E;
   background-color: #e4e4e4;
   border: 2px dashed #ccc;
@@ -181,6 +182,7 @@
   cursor: pointer;
   transition: background 0.3s;
 }
+
 
 .custom-file-upload:hover {
   background-color: #d0d0d0;
@@ -201,3 +203,17 @@
 .document-preview {
   margin-bottom: 1rem;
 }
+
+.template-select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.5rem;
+  background-color: #fff;
+  font-size: 1rem;
+  color: #183B4E;
+  appearance: none;
+  margin-top: 0.5rem;
+}
+
+

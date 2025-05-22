@@ -1,112 +1,186 @@
-import React, { use, useState } from 'react';
-import { BiInfoCircle } from "react-icons/bi";
-import ImageUploader from './image-uploader/image-uploader.js';
+import React, { useEffect, useState, useRef } from 'react';
+import { useAuth } from '../../../context/AuthContext.js';
+import { useNavigate } from 'react-router-dom';
 import './upload-page.css';
 import excelImage from './excelExample.png';
 import wordImage from './wordExample.png';
-import preview from './preview.png';
-import { useAuth } from '../../../context/AuthContext.js';
-import { useNavigate } from 'react-router-dom';
+import { renderAsync } from 'docx-preview';
+import JSZip from 'jszip';
+import api from '../../Interceptor/api'; // Zaimportuj swój interceptor
 
 const UploadPage = () => {
   const navigate = useNavigate();
-
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [excelFiles, setExcelFiles] = useState([]);
   const [wordFiles, setWordFiles] = useState([]);
-  const [excelPreviewData, setExcelPreviewData] = useState([]);
+  const [availableTemplates, setAvailableTemplates] = useState([]);
+  const [selectedTemplateKey, setSelectedTemplateKey] = useState('');
+  const [previewDocuments, setPreviewDocuments] = useState([]);
+  const [selectedPreviewDoc, setSelectedPreviewDoc] = useState(null);
+  const [error, setError] = useState(null);
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
   
-  const handleExcelUpload = async (event) => {
-  const files = Array.from(event.target.files);
-  setExcelFiles((prev) => [...prev, ...files]);
-  event.target.value = '';
+  const viewerRef = useRef(null);
 
-  if (files.length > 0) {
+  const handlePreview = async () => {
+    if (excelFiles.length === 0) {
+      setError("Dodaj plik Excela z danymi");
+      return;
+    }
+
+    let templateFile = wordFiles[0];
+    
+    if (selectedTemplateKey && wordFiles.length === 0) {
+      try {
+        const response = await api.get(`/templates/get_template/${encodeURIComponent(selectedTemplateKey)}`, {
+          responseType: 'blob'
+        });
+
+        const blob = response.data;
+        const filename = selectedTemplateKey.split('/').pop();
+        templateFile = new File([blob], filename, { type: blob.type });
+      } catch (err) {
+        console.error("Błąd pobierania szablonu:", err);
+        setError("Nie udało się pobrać szablonu.");
+        return;
+      }
+    } else if (wordFiles.length === 0) {
+      setError("Dodaj szablon Word lub wybierz z listy");
+      return;
+    }
+
+    setIsPreviewLoading(true);
+    setError(null);
+
     const formData = new FormData();
-    formData.append('file', files[0]); // tylko pierwszy plik do podglądu
+    formData.append("data_file", excelFiles[0]);
+    formData.append("template_file", templateFile);
 
     try {
-      const response = await fetch('http://localhost:8000/upload-data/', {
-        method: 'POST',
-        body: formData,
+      const response = await api.post("/documents/preview-docx", formData, {
+        responseType: "arraybuffer"
       });
 
-      if (!response.ok) throw new Error("Błąd podczas pobierania podglądu");
+      const zip = await JSZip.loadAsync(response.data);
+      const docs = [];
 
-      const data = await response.json();
-      setExcelPreviewData(data);
-    } catch (error) {
-      console.error("Podgląd Excel - błąd:", error);
-      setExcelPreviewData([]);
+      for (const [filename, file] of Object.entries(zip.files)) {
+        if (filename.endsWith('.docx')) {
+          const content = await file.async('arraybuffer');
+          docs.push({
+            name: filename,
+            content: content
+          });
+        }
+      }
+
+      setPreviewDocuments(docs);
+      if (docs.length > 0) {
+        setSelectedPreviewDoc(0);
+        setShowPreview(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Błąd podczas podglądu dokumentu.");
+    } finally {
+      setIsPreviewLoading(false);
     }
-  }
-};
+  };
 
+  const renderSelectedDocument = async () => {
+    if (selectedPreviewDoc !== null && previewDocuments[selectedPreviewDoc]) {
+      viewerRef.current.innerHTML = "";
+      await renderAsync(previewDocuments[selectedPreviewDoc].content, viewerRef.current);
+    }
+  };
 
-const handleWordUpload = (event) => {
-  const files = Array.from(event.target.files);
-  setWordFiles((prev) => [...prev, ...files]);
+  useEffect(() => {
+    if (showPreview) {
+      renderSelectedDocument();
+    }
+  }, [selectedPreviewDoc, showPreview]);
 
-  // Zresetuj wartość inputa
-  event.target.value = '';
-};
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const res = await api.get('/templates/get_templates');
+        setAvailableTemplates(res.data.templates || []);
+      } catch (err) {
+        console.error("Błąd pobierania szablonów:", err);
+      }
+    };
 
-  
+    fetchTemplates();
+  }, []);
+
+  const handleExcelUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    setExcelFiles((prev) => [...prev, ...files]);
+    event.target.value = '';
+  };
+
+  const handleWordUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setWordFiles((prev) => [...prev, ...files]);
+    event.target.value = '';
+  };
+
   const removeExcelFile = (index) => {
     setExcelFiles((prev) => prev.filter((_, i) => i !== index));
   };
-
 
   const removeWordFile = (index) => {
     setWordFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData();
 
-
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  const formData = new FormData();
-
-  // Dodaj pliki Excel
-  for (const file of excelFiles) {
-    formData.append('data_file', file);  // Klucz 'excel_files' w formularzu
-  }
-
-  // Dodaj pliki Word
-  for (const file of wordFiles) {
-    formData.append('template_file', file);  // Klucz 'word_templates' w formularzu
-  }
-
-  const endpoint = `http://localhost:8000/generate-docx`;
-
-  try {
-    const response = await fetch("http://localhost:8000/generate-docx/", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Błąd podczas pobierania pliku");
+    for (const file of excelFiles) {
+      formData.append('data_file', file);
     }
 
-    const blob = await response.blob(); // <- Pobieramy dane jako Blob (plik)
-    const url = window.URL.createObjectURL(blob); // <- Tworzymy URL do pobrania
+    if (selectedTemplateKey) {
+      try {
+        const response = await api.get(`/templates/get_template/${encodeURIComponent(selectedTemplateKey)}`, {
+          responseType: 'blob'
+        });
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "wygenerowany-plik.zip"; // <- Nazwa zapisywanego pliku
-    a.click(); // <- Symulujemy kliknięcie, żeby rozpocząć pobieranie
+        const blob = response.data;
+        const filename = selectedTemplateKey.split('/').pop();
+        const file = new File([blob], filename, { type: blob.type });
+        formData.append('template_file', file);
+      } catch (err) {
+        console.error("Błąd pobierania szablonu:", err);
+        alert("Nie udało się pobrać szablonu.");
+        return;
+      }
+    }
 
-    window.URL.revokeObjectURL(url); // <- Sprzątamy po sobie
+    for (const file of wordFiles) {
+      formData.append('template_file', file);
+    }
 
-    window.alert("Plik pobrany!");
-  } catch (error) {
-    console.error("Błąd:", error);
-    window.alert("Nie udało się pobrać pliku.");
-  }
-};
+    try {
+      const response = await api.post("/documents/generate_docx", formData, {
+        responseType: "blob"
+      });
 
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "wygenerowany-plik.zip";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      alert("Plik pobrany!");
+    } catch (error) {
+      console.error("Błąd:", error);
+      alert("Nie udało się pobrać pliku.");
+    }
+  };
 
   return (
     <>
@@ -121,113 +195,135 @@ const handleSubmit = async (event) => {
         </header>
 
         <div className="tutorial-section">
-        <div className="tutorial-steps">
-          <div className="step">
-            <img src={excelImage} alt="Krok 1 - Excel" />
-            <p>1. Wgraj plik Excela z danymi</p>
-          </div>
-          <div className="step">
-            <img src={wordImage} alt="Krok 2 - Word" />
-            <p>2. Dodaj swój szablon Word/PDF - kolumny do podstawienia z Excela zamieść między klamrami: {"{{ }}"}</p>
-          </div>
-          <div className="step">
-            <img src={wordImage} alt="Krok 3 - Podsumowanie" />
-            <p>3. Sprawdź podsumowanie i wygeneruj dokumenty!</p>
+          <div className="tutorial-steps">
+            <div className="step">
+              <img src={excelImage} alt="Krok 1 - Excel" />
+              <p>1. Wgraj plik Excela z danymi</p>
+            </div>
+            <div className="step">
+              <img src={wordImage} alt="Krok 2 - Word" />
+              <p>2. Dodaj swój szablon Word/PDF – użyj {"{{ }}"}</p>
+            </div>
+            <div className="step">
+              <img src={wordImage} alt="Krok 3 - Podsumowanie" />
+              <p>3. Wygeneruj dokumenty!</p>
+            </div>
           </div>
         </div>
-      </div>
 
         <main className="upload-main">
-          <div>
-            <form className="upload-form">
-
-              <div className="upload-input-group">
-                <label>Dodaj pliki Excel</label>
-                <div className="custom-file-upload" onClick={() => document.getElementById('excelUpload').click()}>
-                  ➕
-                </div>
-                <input
-                  type="file"
-                  id="excelUpload"
-                  accept=".xlsx,.xls"
-                  onChange={handleExcelUpload}
-                  multiple
-                  style={{ display: 'none' }}
-                />
+          <form className="upload-form" onSubmit={handleSubmit}>
+            <div className="upload-input-group">
+              <label>Dodaj pliki Excel</label>
+              <div className="custom-file-upload" onClick={() => document.getElementById('excelUpload').click()}>
+                ➕
               </div>
+              <input
+                type="file"
+                id="excelUpload"
+                accept=".xlsx,.xls"
+                onChange={handleExcelUpload}
+                multiple
+                style={{ display: 'none' }}
+              />
+            </div>
 
-
-              {excelFiles.length > 0 && (
-                <div className="excel-file-list">
-                  {excelFiles.map((file, index) => (
-                    <div key={index} className="excel-file-item">
-                      <span>{file.name}</span>
-                      <button
-                        type="button"
-                        className="remove-excel-button"
-                        onClick={() => removeExcelFile(index)}
-                      >
-                        ❌
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="upload-input-group">
-                <label>Dodaj szablony Word</label>
-                <div className="custom-file-upload" onClick={() => document.getElementById('wordUpload').click()}>
-                  ➕
-                </div>
-                <input
-                  type="file"
-                  id="wordUpload"
-                  accept=".docx,.doc"
-                  onChange={handleWordUpload}
-                  multiple
-                  style={{ display: 'none' }}
-                />
-              </div>
-
-              {wordFiles.length > 0 && (
-                <div className="word-file-list">
-                  {wordFiles.map((file, index) => (
-                    <div key={index} className="word-file-item">
-                      <span>{file.name}</span>
-                      <button
-                        type="button"
-                        className="remove-word-button"
-                        onClick={() => removeWordFile(index)}
-                      >
-                        ❌
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-                {excelPreviewData.length > 0 && (
-                  <div className="excel-preview-box">
-                    {excelPreviewData.map((item, index) => (
-                      <div key={index} className="document-preview">
-                        <strong>Dokument {index + 1}:</strong>
-                        <pre>
-                          {Object.entries(item).map(([key, value]) => `${key}: ${value}`).join('\n')}
-                        </pre>
-                      </div>
-                    ))}
+            {excelFiles.length > 0 && (
+              <div className="excel-file-list">
+                {excelFiles.map((file, index) => (
+                  <div key={index} className="excel-file-item">
+                    <span>{file.name}</span>
+                    <button type="button" onClick={() => removeExcelFile(index)}>❌</button>
                   </div>
-                )}
+                ))}
+              </div>
+            )}
+
+            <div className="upload-input-group">
+              <label>Wybierz szablon Word z bazy lub dodaj własny</label>
+              <select
+                className="template-select"
+                value={selectedTemplateKey}
+                onChange={(e) => setSelectedTemplateKey(e.target.value)}
+              >
+                <option value="">-- Wybierz z dostępnych --</option>
+                {availableTemplates.map((tpl) => (
+                  <option key={tpl.key} value={tpl.key}>
+                    {tpl.filename}
+                  </option>
+                ))}
+              </select>
+
+              <div className="custom-file-upload" onClick={() => document.getElementById('wordUpload').click()}>
+                ➕ 
+              </div>
+              <input
+                type="file"
+                id="wordUpload"
+                accept=".docx,.doc"
+                onChange={handleWordUpload}
+                multiple
+                style={{ display: 'none' }}
+              />
+            </div>
+
+            {wordFiles.length > 0 && (
+              <div className="word-file-list">
+                {wordFiles.map((file, index) => (
+                  <div key={index} className="word-file-item">
+                    <span>{file.name}</span>
+                    <button type="button" onClick={() => removeWordFile(index)}>❌</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="action-buttons">
+              <button 
+                type="button" 
+                className="upload-button"
+                onClick={handlePreview}
+                disabled={isPreviewLoading}
+              >
+                {isPreviewLoading ? 'Ładowanie podglądu...' : 'Podgląd'}
+              </button>
+
               {user ? (
-              <button type="button" className="upload-button" onClick={handleSubmit}>
-                Wygeneruj!
-              </button>
+                <button type="submit" className="upload-button">Wygeneruj i pobierz!</button>
               ) : (
-              <button type="button" className="upload-button" onClick={() => navigate('/login')}>
-                Zaloguj się żeby wygenerować!
-              </button>
+                <button type="button" className="upload-button" onClick={() => navigate('/login')}>
+                  Zaloguj się żeby wygenerować!
+                </button>
               )}
-            </form>
-          </div>
+            </div>
+
+            {error && <p className="error-message">{error}</p>}
+          </form>
+
+          {showPreview && previewDocuments.length > 0 && (
+            <div className="preview-section">
+              <h3>Podgląd dokumentów</h3>
+              
+              <div className="document-selector">
+                <label>Wybierz dokument do podglądu:</label>
+                <select
+                  value={selectedPreviewDoc || ''}
+                  onChange={(e) => setSelectedPreviewDoc(parseInt(e.target.value))}
+                >
+                  {previewDocuments.map((doc, index) => (
+                    <option key={index} value={index}>
+                      {doc.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div 
+                ref={viewerRef} 
+                className="docx-viewer"
+              />
+            </div>
+          )}
         </main>
       </div>
     </>
