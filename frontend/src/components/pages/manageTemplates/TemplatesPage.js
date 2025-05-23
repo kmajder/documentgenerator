@@ -27,30 +27,21 @@ const TemplatesPage = () => {
   };
 
   const handleTemplateClick = async (key) => {
-  setError('')
-  setSelectedTemplate(key)
-  if (viewerDocument.current) viewerDocument.current.innerHTML = ''
+    setError('')
+    setSelectedTemplate(key)
+    if (viewerDocument.current) viewerDocument.current.innerHTML = ''
 
-  try {
-    const response = await api.get(`/templates/get_template/${encodeURIComponent(key)}`, {
-      responseType: 'arraybuffer'
-    });
+    try {
+      const response = await api.get(`/templates/get_template/${encodeURIComponent(key)}`, {
+        responseType: 'arraybuffer'
+      });
 
-    const arrayBuffer = response.data;
-    const isPdf = key.toLowerCase().endsWith('.pdf');
-
-    if (isPdf) {
-      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
-      const pdfUrl = URL.createObjectURL(blob);
-      viewerDocument.current.innerHTML = `<iframe src="${pdfUrl}" width="100%" height="800px" style="border:none;"></iframe>`;
-    } else {
+      const arrayBuffer = response.data;
       await renderAsync(arrayBuffer, viewerDocument.current);
+    } catch (err) {
+      setError('Błąd podczas ładowania dokumentu.');
     }
-  } catch (err) {
-    setError('Błąd podczas ładowania dokumentu.');
   }
-}
-
 
   const handleUpload = async (e) => {
     e.preventDefault()
@@ -112,7 +103,7 @@ const TemplatesPage = () => {
           <Form.Label>Dodaj szablon Word (DOCX)</Form.Label>
           <Form.Control type="file" accept=".docx" required />
         </Form.Group>
-        <Button type="submit" disabled={uploading} className="mt-2">
+        <Button type="submit" className="addTemplateButton" disabled={uploading}>
           {uploading ? 'Wysyłanie...' : 'Dodaj szablon'}
         </Button>
       </Form>

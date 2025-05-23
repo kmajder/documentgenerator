@@ -6,11 +6,12 @@ import excelImage from './excelExample.png';
 import wordImage from './wordExample.png';
 import { renderAsync } from 'docx-preview';
 import JSZip from 'jszip';
-import api from '../../Interceptor/api'; // Zaimportuj swój interceptor
+import api from '../../Interceptor/api';
+import Alert from 'react-bootstrap/Alert';
 
 const UploadPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, checkAuth } = useAuth();
 
   const [excelFiles, setExcelFiles] = useState([]);
   const [wordFiles, setWordFiles] = useState([]);
@@ -20,6 +21,7 @@ const UploadPage = () => {
   const [selectedPreviewDoc, setSelectedPreviewDoc] = useState(null);
   const [error, setError] = useState(null);
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   
   const viewerRef = useRef(null);
@@ -83,7 +85,12 @@ const UploadPage = () => {
       }
     } catch (err) {
       console.error(err);
-      setError("Błąd podczas podglądu dokumentu.");
+      if (err.response?.status === 403) {
+        setError("Przekroczono limit dokumentów!");
+        await checkAuth();
+      } else {
+        setError("Błąd podczas podglądu dokumentu.");
+      }
     } finally {
       setIsPreviewLoading(false);
     }
@@ -137,14 +144,22 @@ const UploadPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const formData = new FormData();
-
-    for (const file of excelFiles) {
-      formData.append('data_file', file);
+    setIsGenerating(true);
+    
+    if (user?.doc_count >= user?.max_documents_per_month) {
+      alert("Przekroczono limit dokumentów!");
+      setIsGenerating(false);
+      return;
     }
 
-    if (selectedTemplateKey) {
-      try {
+    const formData = new FormData();
+
+    try {
+      for (const file of excelFiles) {
+        formData.append('data_file', file);
+      }
+
+      if (selectedTemplateKey) {
         const response = await api.get(`/templates/get_template/${encodeURIComponent(selectedTemplateKey)}`, {
           responseType: 'blob'
         });
@@ -153,18 +168,12 @@ const UploadPage = () => {
         const filename = selectedTemplateKey.split('/').pop();
         const file = new File([blob], filename, { type: blob.type });
         formData.append('template_file', file);
-      } catch (err) {
-        console.error("Błąd pobierania szablonu:", err);
-        alert("Nie udało się pobrać szablonu.");
-        return;
       }
-    }
 
-    for (const file of wordFiles) {
-      formData.append('template_file', file);
-    }
+      for (const file of wordFiles) {
+        formData.append('template_file', file);
+      }
 
-    try {
       const response = await api.post("/documents/generate_docx", formData, {
         responseType: "blob"
       });
@@ -175,10 +184,19 @@ const UploadPage = () => {
       a.download = "wygenerowany-plik.zip";
       a.click();
       window.URL.revokeObjectURL(url);
+      
+      await checkAuth();
       alert("Plik pobrany!");
     } catch (error) {
       console.error("Błąd:", error);
-      alert("Nie udało się pobrać pliku.");
+      if (error.response?.status === 403) {
+        alert("Przekroczono limit dokumentów!");
+        await checkAuth();
+      } else {
+        alert("Nie udało się pobrać pliku.");
+      }
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -190,27 +208,45 @@ const UploadPage = () => {
       ></div>
 
       <div className="upload-container">
-        <header className="upload-header">
-          <h1>Wygeneruj dokumenty!</h1>
-        </header>
 
         <div className="tutorial-section">
+          <h2 className="tutorial-title">Jak generować dokumenty w 3 krokach?</h2>
           <div className="tutorial-steps">
-            <div className="step">
-              <img src={excelImage} alt="Krok 1 - Excel" />
-              <p>1. Wgraj plik Excela z danymi</p>
+            <div className="step-card">
+              <div className="step-number">1</div>
+              <img src={excelImage} alt="Excel" className="step-image" />
+              <div className="step-content">
+                <h3>Wgraj plik Excela</h3>
+                <p>Załaduj plik .xlsx/.xls z danymi. Upewnij się że nagłówki kolumn są poprawne.</p>
+              </div>
             </div>
-            <div className="step">
-              <img src={wordImage} alt="Krok 2 - Word" />
-              <p>2. Dodaj swój szablon Word/PDF – użyj {"{{ }}"}</p>
+
+            <div className="step-card">
+              <div className="step-number">2</div>
+              <img src={wordImage} alt="Word" className="step-image" />
+              <div className="step-content">
+                <h3>Dodaj szablon Word</h3>
+                <p>Użyj znaczników {"{{nazwa_kolumny}}"} w dokumencie aby wskazać miejsca wstawienia danych.</p>
+              </div>
             </div>
-            <div className="step">
-              <img src={wordImage} alt="Krok 3 - Podsumowanie" />
-              <p>3. Wygeneruj dokumenty!</p>
+
+            <div className="step-card">
+              <div className="step-number">3</div>
+              <img src={wordImage} alt="Generowanie" className="step-image" />
+              <div className="step-content">
+                <h3>Generuj i pobierz</h3>
+                <p>Kliknij przycisk generuj i pobierz gotowe dokumenty w formacie ZIP.</p>
+              </div>
             </div>
+            
           </div>
         </div>
-
+{user && (
+            <div className="usage-counter">
+              <span>Wykorzystane dokumenty: </span>
+              <strong>{user.doc_count}/{user.max_documents_per_month}</strong>
+            </div>
+          )}
         <main className="upload-main">
           <form className="upload-form" onSubmit={handleSubmit}>
             <div className="upload-input-group">
@@ -289,13 +325,36 @@ const UploadPage = () => {
               </button>
 
               {user ? (
-                <button type="submit" className="upload-button">Wygeneruj i pobierz!</button>
+                <button 
+                  type="submit" 
+                  className="upload-button"
+                  disabled={user.doc_count >= user.max_documents_per_month || isGenerating}
+                >
+                  {isGenerating ? 'Generowanie...' : 
+                   user.doc_count < user.max_documents_per_month 
+                    ? "Wygeneruj i pobierz!" 
+                    : "Limit dokumentów wyczerpany!"}
+                </button>
               ) : (
                 <button type="button" className="upload-button" onClick={() => navigate('/login')}>
                   Zaloguj się żeby wygenerować!
                 </button>
               )}
             </div>
+
+            {user?.max_documents_per_month && (
+              <div className="limit-info mt-3">
+                {user.doc_count >= user.max_documents_per_month ? (
+                  <Alert variant="danger">
+                    Osiągnąłeś limit {user.max_documents_per_month} dokumentów w tym miesiącu!
+                  </Alert>
+                ) : (
+                  <Alert variant="info">
+                    Pozostało dokumentów: {user.max_documents_per_month - user.doc_count}
+                  </Alert>
+                )}
+              </div>
+            )}
 
             {error && <p className="error-message">{error}</p>}
           </form>

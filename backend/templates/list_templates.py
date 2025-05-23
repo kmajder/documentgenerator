@@ -25,7 +25,7 @@ def list_templates():
                 "key": obj["Key"]
             }
             for obj in contents
-            if obj["Key"].lower().endswith((".docx", ".pdf"))
+            if obj["Key"].lower().endswith(".docx")  # Usunięto sprawdzanie PDF
         ]
 
         return jsonify({"templates": templates})

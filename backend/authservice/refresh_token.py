@@ -6,14 +6,12 @@ from bson import ObjectId
 from config import Config
 import datetime
 
-def generate_access_token(user_id, email, username, plan, doc_count):
+def generate_access_token(user_id, email, username):
     return jwt.encode({
         "user_id": str(user_id),
         "email": email,
         "username": username,
-        "plan": plan,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=Config.ACCESS_TOKEN_EXPIRY),
-        "doc_count": doc_count
     }, Config.SECRET_KEY, algorithm="HS256")
 
 def refresh_access_token():
@@ -38,7 +36,15 @@ def refresh_access_token():
         if not user:
             return jsonify({"error": "Użytkownik nie istnieje"}), 404
 
-        new_access_token = generate_access_token(user["_id"], user["email"], user["username"], user.get("plan", Config.DEFAULT_PLAN), user["doc_count"])
+        # Pobierz aktualne dane planu
+        plan = mongo.db.plans.find_one({"name": user.get("plan", Config.DEFAULT_PLAN)}) or {}
+        max_documents = plan.get("max_documents_per_month")
+
+        new_access_token = generate_access_token(
+            user["_id"],
+            user["email"],
+            user["username"],
+        )
 
         response = make_response(jsonify({"message": "Token odświeżony"}))
         response.set_cookie("access_token", new_access_token, httponly=True, secure=False, samesite="Strict", max_age=Config.ACCESS_TOKEN_EXPIRY * 60)

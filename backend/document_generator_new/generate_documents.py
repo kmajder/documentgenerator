@@ -3,11 +3,31 @@ from io import BytesIO
 from docxtpl import DocxTemplate
 import pandas as pd
 import zipfile
-import tempfile
 from authutils.auth_utils import token_required
+from extensions import mongo
+from bson import ObjectId
+from docx import Document
+from docx.opc.exceptions import PackageNotFoundError
+from config import Config
 
 @token_required
 def generate_documents():
+    # Sprawdź limit dokumentów
+    user_id = request.user.get("user_id")
+    user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
+    
+    if not user:
+        return jsonify({"error": "Użytkownik nie istnieje"}), 404
+
+    plan = mongo.db.plans.find_one({"name": user.get("plan", Config.DEFAULT_PLAN)})
+    if not plan:
+        return jsonify({"error": "Plan użytkownika nie znaleziony"}), 400
+
+    max_docs = plan.get("max_documents_per_month", 0)
+    if user.get("doc_count", 0) >= max_docs:
+        return jsonify({"error": "Przekroczono limit dokumentów dla Twojego planu"}), 403
+
+    # Walidacja plików
     if "data_file" not in request.files or "template_file" not in request.files:
         return jsonify({"error": "Brak pliku danych lub szablonu"}), 400
 
@@ -24,6 +44,13 @@ def generate_documents():
         return jsonify({"error": "Nieprawidłowy format szablonu. Wymagany .docx"}), 400
 
     try:
+        # Wczytaj i zweryfikuj szablon
+        template_bytes = template_file.read()
+        try:
+            Document(BytesIO(template_bytes))  # Weryfikacja struktury DOCX
+        except PackageNotFoundError:
+            return jsonify({"error": "Nieprawidłowy plik szablonu DOCX"}), 400
+
         # Wczytaj dane
         data_bytes = data_file.read()
         if data_ext == "csv":
@@ -31,19 +58,34 @@ def generate_documents():
         else:
             df = pd.read_excel(BytesIO(data_bytes))
 
+        if df.empty:
+            return jsonify({"error": "Plik danych jest pusty"}), 400
+            
         records = df.to_dict(orient="records")
+        if len(records) == 0:
+            return jsonify({"error": "Brak danych do generacji"}), 400
 
-        # Stwórz tymczasowy plik ZIP
+        # Generuj dokumenty
         zip_buffer = BytesIO()
         with zipfile.ZipFile(zip_buffer, "w") as zipf:
             for idx, record in enumerate(records):
-                doc = DocxTemplate(BytesIO(template_file.read()))
-                doc.render(record)
-                output_buffer = BytesIO()
-                doc.save(output_buffer)
-                output_buffer.seek(0)
-                zipf.writestr(f"document_{idx + 1}.docx", output_buffer.read())
-                template_file.seek(0)  # reset pliku po każdej iteracji
+                try:
+                    doc = DocxTemplate(BytesIO(template_bytes))  # Użyj zapisanego szablonu
+                    doc.render(record)
+                    output_buffer = BytesIO()
+                    doc.save(output_buffer)
+                    output_buffer.seek(0)
+                    zipf.writestr(f"document_{idx + 1}.docx", output_buffer.getvalue())
+                except Exception as e:
+                    return jsonify({
+                        "error": f"Błąd generowania dokumentu {idx+1}: {str(e)}"
+                    }), 500
+
+        # Aktualizuj licznik
+        mongo.db.users.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$inc": {"doc_count": len(records)}}
+        )
 
         zip_buffer.seek(0)
         return send_file(
@@ -53,6 +95,9 @@ def generate_documents():
             download_name="generated_documents.zip"
         )
 
+    except pd.errors.EmptyDataError:
+        return jsonify({"error": "Plik danych jest pusty"}), 400
+    except pd.errors.ParserError as pe:
+        return jsonify({"error": f"Błąd parsowania danych: {str(pe)}"}), 400
     except Exception as e:
-        return jsonify({"error": f"Błąd generowania dokumentów: {str(e)}"}), 500
-
+        return jsonify({"error": f"Krytyczny błąd generowania: {str(e)}"}), 500

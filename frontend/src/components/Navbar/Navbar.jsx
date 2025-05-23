@@ -4,18 +4,17 @@ import './Navbar.css';
 import AppleTrade from './image.png';
 import { FaFacebook, FaInstagram, FaUser } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext.js';
+
 function Nav() {
   const { user, logout } = useAuth();
-
   const [isMenuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
-  const burgerRef = useRef(null); // Referencja do hamburgera
+  const burgerRef = useRef(null);
 
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
 
-  // Funkcja do zamknięcia menu, gdy klikniemy poza nim i poza hamburgerem
   const handleClickOutside = (e) => {
     if (
       menuRef.current && 
@@ -46,36 +45,36 @@ function Nav() {
       </Link>
 
       <div ref={burgerRef} className="menu-toggle" onClick={toggleMenu}>
-        &#9776; {/* Ikona hamburgera */}
+        &#9776;
       </div>
 
       <nav ref={menuRef} className={`navbar ${isMenuOpen ? 'open' : ''}`}>
-        <Link to="/upload" className="sellLink">Wygeneruj dokument!</Link>
-        { user ? (
-        <Link to="/my-templates" className="sellLink">Moje szablony</Link>
-        ) : null}
-        {user ? (
-        <button onClick={logout}></button>
-        ) : null}
-        <Link to="/about" className="about">O nas</Link>
-        <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="socialOpen">
-          <FaInstagram className="socialIcon" />
-        </a>
-        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="socialOpen">
-          <FaFacebook className="socialIcon" />
-        </a>
-        <div className="socialMedia">
-          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
-            <FaInstagram className="socialIcon" />
-          </a>
-          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
-            <FaFacebook className="socialIcon" />
-          </a>
-          { user ? (
-          <a href="/account" className="myAccount">
-          <FaUser className="socialIcon" />
-          </a>
-          ) : null }
+        <div className="nav-buttons">
+          <Link to="/upload" className="nav-button primary">
+            Wygeneruj dokument
+          </Link>
+          {user && (
+            <Link to="/my-templates" className="nav-button secondary">
+              Moje szablony
+            </Link>
+          )}
+        </div>
+        
+        <div className="right-section">
+          <div className="social-icons">
+            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">
+              <FaInstagram className="socialIcon" />
+            </a>
+            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
+              <FaFacebook className="socialIcon" />
+            </a>
+            {user && (
+              <Link to="/account" className="account-icon">
+                <FaUser className="socialIcon" />
+              </Link>
+            )}
+            <Link to="/about" className="about">O nas</Link>
+          </div>
         </div>
       </nav>
     </header>

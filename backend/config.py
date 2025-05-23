@@ -15,3 +15,4 @@ class Config:
     S3_SECRET_KEY = os.environ.get("S3_SECRET_KEY", "your_secret_key")
     S3_TEMPLATES_BUCKET_NAME = os.environ.get("S3_TEMPLATES_BUCKET_NAME", "templates")
     S3_REGION = os.environ.get("S3_REGION", "us-east-1")
+    DEFAULT_MAX_DOCUMENTS = int(os.environ.get("DEFAULT_MAX_DOCUMENTS", 10))  # Default max documents for free plan

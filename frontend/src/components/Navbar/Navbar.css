@@ -9,178 +9,165 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+  padding: 0 20px;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
   z-index: 1000;
 }
 
 .caseXpertLogo {
-  height: 100%; /* Logo zajmuje całą wysokość nagłówka */
+  height: 100%;
   display: flex;
   align-items: center;
 }
 
 .caseXpertLogoImage {
-  height: 100%; /* Logo będzie miało pełną wysokość headera */
-  width: auto; /* Dynamicznie dopasowuje szerokość, aby zachować proporcje */
+  height: 100%;
+  width: auto;
 }
 
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   flex-grow: 1;
+  margin-left: 20px;
 }
 
-.navbar a {
-  font-size: 18px;
-  color: #000000;
-  margin-left: 10px;
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-button {
+  padding: 8px 16px;
+  border-radius: 20px;
   text-decoration: none;
-}
-
-.about {
-  position: absolute;
-  right: 25px;
-  color: white !important;
-}
-
-.navbar .sellLink {
-  border: 1px solid;
-  font-size: 18px;
-  border-radius: 12px;
-  padding: 5px;
-  background-color: #183B4E;
-  color: white;
-}
-.menu-toggle {
-  display: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #333333;
-  margin-left: auto;
-}
-
-.socialMedia {
-  position: absolute;
-  right: 100px;
-  color: white;
-}
-
-.socialOpen {
-  display: none;
-}
-.socialIcon {
-  position: relative;
-  top: 4px; /* Domyślna wartość top */
-  color: #ffffff;
-  font-size: 24px;
-  margin-left: 10px;
-  transition: color 0.3s ease;
+  font-weight: 500;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.socialIcon:hover {
-  color: #ad32ff; /* Zmiana koloru na hover */
+.nav-button.primary {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
 }
 
-/* Dla mniejszych ekranów */
+.nav-button.primary:hover {
+  background-color: #0f2a3a;
+}
+
+.nav-button.secondary {
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.nav-button.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.about {
+  color: #ffffff;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.social-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  order: 2;
+}
+
+.socialIcon {
+  color: #ffffff;
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.socialIcon:hover {
+  color: #ad32ff;
+}
+
+.menu-toggle {
+  display: none;
+  cursor: pointer;
+  color: white;
+  font-size: 24px;
+}
+
+/* Mobile styles */
 @media (max-width: 768px) {
   .mainHeader {
     height: 8vh;
-  } 
-
-    
+    padding: 0 15px;
+  }
+  
   .navbar {
     display: none;
-  }
-
-  .menu-toggle {
-    display: block;
-    color: rgb(255, 255, 255);
-    font-size: 36px;
-    width: 15%;
-    margin-left: auto; /* Dodaj to, aby wyrównać do prawej */
-    text-align: right; /* Ustawienie tekstu (ikony hamburgera) do prawej */
-    padding-right: 10px; /* Opcjonalnie dodaj odstęp po prawej stronie */
-}
-
-
-  .navbar.open {
-    display: flex;
-    flex-direction: column;
     position: absolute;
     top: 8vh;
     left: 0;
     width: 100%;
     background-color: hsl(282, 79%, 91%);
-    color: red;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 15px;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   }
-
-  .socialOpen {
-    display: block;
-    color: black;
+  
+  .navbar.open {
+    display: flex;
   }
-  .socialMedia {
-    display: none;
+  
+  .nav-buttons {
+    flex-direction: column;
+    width: 100%;
   }
-  .navbar a {
-    margin: 10px 0;
+  
+  .nav-button {
+    width: 100%;
+    padding: 10px;
   }
-
-
-  .caseXpertLogo {
-    height: 7vh; /* Logo na całą wysokość nawigacji */
-    justify-content: center; /* Wyśrodkowanie logo pionowo */
+  
+  .right-section {
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
   }
-
-  .caseXpertLogoImage {
-    height: 7vh; /* Logo nie zmienia wysokości */
-    width: 170px; /* Wypełnia całą szerokość, gdy ekran jest mały */
-    max-height: 8vh; /* Ograniczenie maksymalnej wysokości */
-  }
+  
   .about {
-    position: relative; /* Usuń pozycjonowanie absolutne dla wersji mobilnej */
-    right: 0px; /* Dostosuj margines, aby było estetyczne */
-    color: black !important;
+    color: black;
+    padding: 10px 0;
+    order: 0;
   }
-
-}
-
-/* Dropdown menu styles */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-  flex-direction: column; /* Przesunięcie listy w dół */
-}
-
-
-.dropdown-content a {
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown-content a:hover {
-  background-color: #ddd;
-}
-
-/* Show dropdown when active */
-.dropdown-content.show {
-  display: block; /* Flex na mobilnych */
+  
+  .social-icons {
+    order: 1;
+  }
+  
+  .menu-toggle {
+    display: block;
+    font-size: 28px;
+  }
+  
+  .caseXpertLogoImage {
+    height: 7vh;
+    width: auto;
+    max-width: 170px;
+  }
 }

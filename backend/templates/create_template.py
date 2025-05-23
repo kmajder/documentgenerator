@@ -6,7 +6,7 @@ from config import Config
 from authutils.auth_utils import token_required 
 
 BUCKET_NAME = Config.S3_TEMPLATES_BUCKET_NAME
-ALLOWED_EXTENSIONS = {"pdf", "docx"}
+ALLOWED_EXTENSIONS = {"docx"}  # Usunięto PDF
 
 @token_required
 def create_template():
@@ -18,7 +18,7 @@ def create_template():
         return jsonify({"error": "Pusty plik"}), 400
 
     ext = file.filename.rsplit(".", 1)[-1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
+    if ext not in ALLOWED_EXTENSIONS:  # Teraz sprawdza tylko docx
         return jsonify({"error": "Nieprawidłowy format"}), 400
 
     filename = secure_filename(file.filename)
@@ -58,6 +58,5 @@ def create_template():
     except Exception as e:
         app.logger.error(f"Error uploading file to S3: {e}")
         return jsonify({"error": "Błąd przesyłania pliku"}), 500
-
 
     return jsonify({"message": "Plik zapisany w S3", "filename": filename, "key": s3_key}), 200

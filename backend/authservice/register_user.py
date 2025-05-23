@@ -14,16 +14,12 @@ def register_user(username, email, password, plan=Config.DEFAULT_PLAN):
         "username": username,
         "email": email,
         "password_hash": password_hash,
-        "plan": plan,
         "created_at": datetime.datetime.utcnow(),
-        "doc_count": 0,
-        "template_count": 0,
     }).inserted_id
 
     return {
         "message": "User registered",
         "user_id": str(user_id),
         "username": username,
-        "plan": plan,
         "email": email,
     }
